@@ -3,9 +3,18 @@ from minivenmo.exceptions import PaymentException, UsernameException
 
 
 class MiniVenmo:
+    def __init__(self):
+        self.__users = {}
+
     def create_user(self, username, balance, credit_card_number):
-        # TODO: add code here
-        pass
+        if username in self.__users:
+            raise UsernameException(f"Username `{username}` already exists")
+
+        user = User(username)
+        user.add_to_balance(balance)
+        user.add_credit_card(credit_card_number)
+        self.__users[username] = user
+        return user
 
     def render_feed(self, feed):
         # Bobby paid Carol $5.00 for Coffee
@@ -33,14 +42,3 @@ class MiniVenmo:
         venmo.render_feed(feed)
 
         bobby.add_friend(carol)
-
-
-class TestUser(unittest.TestCase):
-
-    def test_this_works(self):
-        with self.assertRaises(UsernameException):
-            raise UsernameException()
-
-
-if __name__ == '__main__':
-    unittest.main()

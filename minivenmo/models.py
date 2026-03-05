@@ -1,3 +1,4 @@
+from minivenmo.exceptions import UsernameException
 import re
 import uuid
 
@@ -21,7 +22,7 @@ class User:
         if self._is_valid_username(username):
             self.username = username
         else:
-            raise UsernameException('Username not valid.')
+            raise UsernameException('Username not valid')
 
 
     def retrieve_feed(self):

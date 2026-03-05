@@ -1,1 +1,1 @@
-from main import MiniVenmo
+from .main import MiniVenmo
