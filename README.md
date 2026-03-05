@@ -1,5 +1,31 @@
 # Taller Technologies
 
+# Instructions
+
+You need `python3` binary available and a Unix type of OS (Mac or Linux).
+
+### Run application:
+
+```
+./run.sh
+```
+
+This will trigger the original application.
+
+
+### Run tests
+
+Tests are available in a different module, in `tests`, so run
+
+```
+./test.sh
+```
+
+To run all tests available.
+
+
+# Statement
+
 """
 MiniVenmo! Imagine that your phone and wallet are trying to have a beautiful
 baby. In order to make this happen, you must write a social payment app.
