@@ -1,16 +1,23 @@
-from minivenmo.exceptions import UsernameException
+from enum import Enum
+from minivenmo.exceptions import UsernameException, PaymentException
 import re
 import uuid
 
 
+class Methods(Enum):
+    BALANCE = 1
+    CREDIT_CARD = 2
+
+
 class Payment:
 
-    def __init__(self, amount, actor, target, note):
+    def __init__(self, amount, actor, target, note, method):
         self.id = str(uuid.uuid4())
         self.amount = float(amount)
         self.actor = actor
         self.target = target
         self.note = note
+        self.method = method
  
 
 class User:
@@ -40,9 +47,11 @@ class User:
         self.friends[friend.username] = friend
 
     def add_to_balance(self, amount):
+        print(f"I: Adding {amount:.2f} to {self} funds")
         self.balance += float(amount)
 
     def add_credit_card(self, credit_card_number):
+        print(f"I: Adding credit card to {self}")
         if self.credit_card_number is not None:
             raise CreditCardException('Only one credit card per user!')
 
@@ -50,33 +59,41 @@ class User:
             self.credit_card_number = credit_card_number
 
         else:
-            raise CreditCardException('Invalid credit card number.')
+            raise CreditCardException("Invalid credit card number.")
 
     def pay(self, target, amount, note):
-        # TODO: add logic to pay with card or balance
-        pass
-
-    def pay_with_card(self, target, amount, note):
+        print(f"I: {self} is paying {target} the amount of {amount:.2f} regarding \"{note}\"")
         amount = float(amount)
 
         if self.username == target.username:
-            raise PaymentException('User cannot pay themselves.')
+            raise PaymentException("Users cannot pay themselves.")
 
         elif amount <= 0.0:
-            raise PaymentException('Amount must be a non-negative number.')
+            raise PaymentException("Amount must be a non-negative number.")
+        
+        method = None
+        if amount <= self.balance:
+            self.pay_with_balance(amount)
+            method = Methods.BALANCE
+        else:
+            self.pay_with_card(target, amount)
+            method = Methods.CREDIT_CARD
 
-        elif self.credit_card_number is None:
-            raise PaymentException('Must have a credit card to make a payment.')
-
-        self._charge_credit_card(self.credit_card_number)
-        payment = Payment(amount, self, target, note)
+        payment = Payment(amount, self, target, note, method)
         target.add_to_balance(amount)
-
         return payment
 
-    def pay_with_balance(self, target, amount, note):
-        # TODO: add code here
-        pass
+    def pay_with_card(self, target, amount):
+        if self.credit_card_number is None:
+            raise PaymentException("Must have a credit card to make a payment.")
+
+        self._charge_credit_card(self.credit_card_number, target, amount)
+
+    def pay_with_balance(self, amount):
+        if self.balance < amount:
+            raise PaymentException("Not enough funds to make payment!")
+
+        self.balance -= amount
 
     def _is_valid_credit_card(self, credit_card_number):
         return credit_card_number in ["4111111111111111", "4242424242424242"]
@@ -84,7 +101,7 @@ class User:
     def _is_valid_username(self, username):
         return re.match('^[A-Za-z0-9_\\-]{4,15}$', username)
 
-    def _charge_credit_card(self, credit_card_number):
+    def _charge_credit_card(self, credit_card_number, target, amount):
         # magic method that charges a credit card thru the card processor
         pass
 
