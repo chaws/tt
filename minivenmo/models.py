@@ -18,6 +18,9 @@ class Payment:
         self.target = target
         self.note = note
         self.method = method
+
+    def __str__(self):
+        return f"{self.actor} paid {self.target} ${self.amount} for {self.note}"
  
 
 class User:
@@ -26,6 +29,7 @@ class User:
         self.credit_card_number = None
         self.balance = 0.0
         self.friends = {}
+        self.activities = []
 
         if self._is_valid_username(username):
             self.username = username
@@ -33,8 +37,7 @@ class User:
             raise UsernameException('Username not valid')
 
     def retrieve_feed(self):
-        # TODO: add code here
-        return []
+        return self.activities
 
     def add_friend(self, friend):
         assert friend is not None
@@ -79,9 +82,16 @@ class User:
             self.pay_with_card(target, amount)
             method = Methods.CREDIT_CARD
 
+        # Record payment to both users, receiver and sender
         payment = Payment(amount, self, target, note, method)
+        self.add_activity(payment)
+        target.add_activity(payment)
+        
         target.add_to_balance(amount)
         return payment
+
+    def add_activity(self, payment):
+        self.activities.append(payment)
 
     def pay_with_card(self, target, amount):
         if self.credit_card_number is None:
