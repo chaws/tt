@@ -9,7 +9,13 @@ class Methods(Enum):
     CREDIT_CARD = 2
 
 
-class Payment:
+class Activity:
+
+    def render(self):
+        raise NotImplemented()
+
+
+class Payment(Activity):
 
     def __init__(self, amount, actor, target, note, method):
         self.id = str(uuid.uuid4())
@@ -19,9 +25,18 @@ class Payment:
         self.note = note
         self.method = method
 
-    def __str__(self):
+    def render(self):
         return f"{self.actor} paid {self.target} ${self.amount} for {self.note}"
- 
+
+
+class FriendShip(Activity):
+    def __init__(self, actor, target):
+        self.actor = actor
+        self.target = target
+
+    def render(self):
+        return f"{self.actor} added {self.target} as friend"
+        
 
 class User:
 
@@ -48,6 +63,7 @@ class User:
 
         print(f"I: Adding {friend} to the list of {self.username}'s friends")
         self.friends[friend.username] = friend
+        self.add_activity(FriendShip(self, friend))
 
     def add_to_balance(self, amount):
         print(f"I: Adding {amount:.2f} to {self} funds")
@@ -90,8 +106,8 @@ class User:
         target.add_to_balance(amount)
         return payment
 
-    def add_activity(self, payment):
-        self.activities.append(payment)
+    def add_activity(self, activity):
+        self.activities.append(activity)
 
     def pay_with_card(self, target, amount):
         if self.credit_card_number is None:

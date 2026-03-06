@@ -19,7 +19,7 @@ class MiniVenmo:
     def render_feed(self, feed):
         print("************* Feed *************")
         for activity in feed:
-            print(f"I: {activity}")
+            print(f"I: {activity.render()}")
         print("********************************")
 
     @classmethod
@@ -42,3 +42,6 @@ class MiniVenmo:
         venmo.render_feed(feed)
 
         bobby.add_friend(carol)
+
+        # Re-render feed to show new friendship
+        venmo.render_feed(feed)
