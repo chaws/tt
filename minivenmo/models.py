@@ -18,20 +18,26 @@ class User:
     def __init__(self, username):
         self.credit_card_number = None
         self.balance = 0.0
+        self.friends = {}
 
         if self._is_valid_username(username):
             self.username = username
         else:
             raise UsernameException('Username not valid')
 
-
     def retrieve_feed(self):
         # TODO: add code here
         return []
 
-    def add_friend(self, new_friend):
-        # TODO: add code here
-        pass
+    def add_friend(self, friend):
+        assert friend is not None
+
+        if friend.username in self.friends:
+            print(f"I: {friend} is already added to the list of {self.username}'s friends")
+            return
+
+        print(f"I: Adding {friend} to the list of {self.username}'s friends")
+        self.friends[friend.username] = friend
 
     def add_to_balance(self, amount):
         self.balance += float(amount)
@@ -81,4 +87,7 @@ class User:
     def _charge_credit_card(self, credit_card_number):
         # magic method that charges a credit card thru the card processor
         pass
+
+    def __str__(self):
+        return self.username
 
